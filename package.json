@@ -1,0 +1,19 @@
+{
+  "name": "quoordinates",
+  "version": "1.0.0",
+  "description": "- Readwise - OpenAI Embeddings - Nomic - PSQL (PostgreSQL)",
+  "main": "embed-into-supabase.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.29.0",
+    "dotenv": "^16.3.1",
+    "openai": "^3.3.0",
+    "supabase": "^1.77.9"
+  }
+}

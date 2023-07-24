@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "quoordinates"
+version = "0.1.0"
+description = ""
+authors = ["Bram Adams <3282661+bramses@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-dotenv = "^1.0.0"
+requests = "^2.31.0"
+nomic = "^2.0.5"
+supabase = "^1.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
