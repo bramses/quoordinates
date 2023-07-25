@@ -7,8 +7,6 @@ load_dotenv()
 import numpy as np
 
 
-
-
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
@@ -37,7 +35,7 @@ for row in highlights_response.data:
             row['book_url'] = book['readwise_url']
             row['asin'] = book['asin']
             break
-    # print(row)
+
     data.append(row)
 
 # convert embeddings to numpy array
