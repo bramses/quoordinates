@@ -70,8 +70,9 @@ def get_book_ids(highlights):
     return list(set([highlight['book_id'] for highlight in highlights]))
 
 
-# Get all of a user's books/highlights from all time
+# Get all of a user's books/highlights from all time (last fetch in resources.md)
 # all_data = fetch_from_export_api()
+# write_to_file(all_data) 
 
 # Later, if you want to get new highlights updated since your last fetch of allData, do this.
 last_fetch_was_at = datetime.datetime.now() - datetime.timedelta(days=1)  # use your own stored date
