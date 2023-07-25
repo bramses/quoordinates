@@ -57,3 +57,8 @@ node embed-into-supabase.js
 ```
 python nomic-viz.py
 ```
+
+## Images
+
+![Screenshot 2023-07-24 21-18-03](https://github.com/bramses/quoordinates/assets/3282661/ce99a282-946c-4499-b437-dd31d9ba2e1d)
+![Screenshot 2023-07-24 21-17-41](https://github.com/bramses/quoordinates/assets/3282661/9a5b92ca-a7e9-4a31-8e92-3f91cffd8954)
