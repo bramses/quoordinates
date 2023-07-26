@@ -1,57 +1,10 @@
-import { getEmbedding } from "./embed-into-supabase.js"
-import { createClient } from '@supabase/supabase-js'
+
 import dotenv from 'dotenv'
 import xml2js from 'xml2js'
+import { similaritySearch } from './similarity-search.js'
 
 dotenv.config()
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: {
-        persistSession: false
-    }
-})
-
-/*
-return similarity search in this format
-{
-    text
-    title
-    similarity
-}
-*/
-
-const similaritySearch = async (query) => {
-    const embedding = await getEmbedding(query)
-    const res = []
-
-    const { data: documents, error } = await supabase.rpc('match_highlights', {
-        query_embedding: embedding, 
-        match_count: 3, 
-        match_threshold: 0.0
-      })
-
-    for (const document of documents) {
-        const { data: highlights, error } = await supabase.from('highlights').select('*').eq('id', document.id)
-        const book_id = highlights[0].book_id
-        const { data: books, error: bookError } = await supabase.from('books').select('*').eq('book_id', book_id)
-
-
-        res.push({
-            text: highlights[0].text,
-            title: books[0].title,
-            similarity: document.similarity
-        })
-    }
-
-    if (error) { 
-        console.log(error)
-        return
-    }
-
-    return res
-}
 
 /*
 
@@ -99,3 +52,9 @@ const convertToAlfred = async (query) => {
 
 // run semantic search on terminal arg (include spaces) and remove the ? at the end
 convertToAlfred(process.argv.slice(2).join(" ").replace("?", ""))
+
+// async anonomous function
+// (async () => {
+//     const s = await similaritySearch(process.argv.slice(2).join(" ").replace("?", ""))
+//     console.log(s)
+// })()
