@@ -1,18 +1,24 @@
 import { createClient } from '@supabase/supabase-js'
 import { Configuration, OpenAIApi } from "openai";
 import dotenv from 'dotenv'
+import fs from 'fs'
 
 dotenv.config()
 
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
+    organization: process.env.OPENAI_ORG,
   });
   
   const openai = new OpenAIApi(configuration);
 
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false
+    }
+})
 
 const getEmbedding = async (text) => {
     const response = await openai.createEmbedding({
@@ -1302,8 +1308,6 @@ const highlightsExample = [
     }
 ]
 
-// getEmbedding(highlightsExample[0].highlights[0].text)
-
 const convertReadwiseHighlightsToSupabase = async (data) => {
     for (const highlightWrapper of data) {
         const highlights = highlightWrapper.highlights
@@ -1358,7 +1362,15 @@ const convertReadwiseHighlightsToSupabase = async (data) => {
         }
 
         // insert highlights
+        // every 2950 highlights, wait 1 minute
+        let i = 0
         for (const highlight of highlights) {
+
+            if (i % 2950 === 0 && i !== 0) {
+                console.log("waiting 1 minute")
+                await new Promise(resolve => setTimeout(resolve, 60000));
+            }
+
             const text = highlight.text
             const location = highlight.location
             const location_type = highlight.location_type
@@ -1398,7 +1410,31 @@ const convertReadwiseHighlightsToSupabase = async (data) => {
 }
 
 
-// convertReadwiseHighlightsToSupabase(highlightsExample)
+
+const filterHighlightsByCategory = (highlights, category) => {
+    return highlights.filter(highlight => highlight.category === category)
+}
+
+
+const justBooks = async () => {
+    // read data.json using fs
+    const data = JSON.parse(fs.readFileSync('data.json', 'utf8'))
+    const filteredData = filterHighlightsByCategory(data, "books")
+    await convertReadwiseHighlightsToSupabase(filteredData)
+
+    /// ~10k highlights
+    // console.log(filteredData.length)
+
+    // // aggregate all highlights into one array
+    // const highlights = []
+    // for (const book of filteredData) {
+    //     highlights.push(...book.highlights)
+    // }
+
+    // console.log(highlights.length)
+}
+
+// justBooks()
 
 
 const similaritySearch = async (query) => {
@@ -1415,6 +1451,7 @@ const similaritySearch = async (query) => {
         const { data: highlights, error } = await supabase.from('highlights').select('*').eq('id', document.id)
         const book_id = highlights[0].book_id
         const { data: books, error: bookError } = await supabase.from('books').select('*').eq('book_id', book_id)
+
 
         res.push({
             text: highlights[0].text,

@@ -10,6 +10,7 @@ load_dotenv()
 # Get the token from the .env file
 READWISE_ACCESS_TOKEN = os.getenv("READWISE_ACCESS_TOKEN")
 
+
 def check_token():
     # set the headers
     headers = {
@@ -25,6 +26,7 @@ def check_token():
     else:
         print("Token is invalid")
         return False
+
 
 def fetch_from_export_api(updated_after=None):
     full_data = []
@@ -47,9 +49,17 @@ def fetch_from_export_api(updated_after=None):
             break
     return full_data
 
+
 def write_to_file(data):
     with open('data.json', 'w') as outfile:
         json.dump(data, outfile, indent=4)
+
+
+def read_from_file():
+    with open('data.json') as json_file:
+        data = json.load(json_file)
+    return data
+
 
 def get_book_by_id(book_id):
     # https://readwise.io/api/v2/books/<book id>/
@@ -60,11 +70,14 @@ def get_book_by_id(book_id):
 
     return response.json()
 
+
 def filter_highlights_by_book_id(highlights, book_id):
     return [highlight for highlight in highlights if highlight['book_id'] == book_id]
 
+
 def filter_highlights_by_category(highlights, category):
     return [highlight for highlight in highlights if highlight['category'] == category]
+
 
 def get_book_ids(highlights):
     return list(set([highlight['book_id'] for highlight in highlights]))
