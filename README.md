@@ -60,5 +60,8 @@ python nomic-viz.py
 
 ## Images
 
-![Screenshot 2023-07-24 21-18-03](https://github.com/bramses/quoordinates/assets/3282661/ce99a282-946c-4499-b437-dd31d9ba2e1d)
-![Screenshot 2023-07-24 21-17-41](https://github.com/bramses/quoordinates/assets/3282661/9a5b92ca-a7e9-4a31-8e92-3f91cffd8954)
+![Screenshot 2023-07-26 01-46-45](https://github.com/bramses/quoordinates/assets/3282661/b618e3ce-f66b-41a7-ba9d-03b5ef1bd65c)
+![Screenshot 2023-07-26 01-35-19](https://github.com/bramses/quoordinates/assets/3282661/039fc137-7054-4c28-9f2c-39fb4a4c8d2f)
+![Screenshot 2023-07-26 01-35-27](https://github.com/bramses/quoordinates/assets/3282661/efb78a06-1116-4b41-b4c5-e6f1eee6c90d)
+
+
