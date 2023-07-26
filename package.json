@@ -2,10 +2,11 @@
   "name": "quoordinates",
   "version": "1.0.0",
   "description": "- Readwise - OpenAI Embeddings - Nomic - PSQL (PostgreSQL)",
-  "main": "embed-into-supabase.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
