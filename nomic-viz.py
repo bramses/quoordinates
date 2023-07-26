@@ -62,5 +62,5 @@ for row in all_highlights:
 embeddings = np.array(embeddings)
 
 
-project = atlas.map_embeddings(embeddings=embeddings, data=data, name='highlights', description='Highlights from Readwise', reset_project_if_exists=True, colorable_fields=['book_id'], id_field='id')
+project = atlas.map_embeddings(embeddings=embeddings, data=data, name='highlights', description='Highlights from Readwise', reset_project_if_exists=True, colorable_fields=['book_id'], id_field='id', build_topic_model=True, topic_label_field='text')
 print(project)

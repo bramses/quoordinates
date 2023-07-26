@@ -9,6 +9,7 @@ load_dotenv()
 
 # Get the token from the .env file
 READWISE_ACCESS_TOKEN = os.getenv("READWISE_ACCESS_TOKEN")
+DAY_LAST_FETCHED = os.getenv("DAY_LAST_FETCHED")
 
 
 def check_token():
@@ -83,12 +84,17 @@ def get_book_ids(highlights):
     return list(set([highlight['book_id'] for highlight in highlights]))
 
 
-# Get all of a user's books/highlights from all time (last fetch in resources.md)
+# Get all of a user's books/highlights from all time (use this the first time you run this script)
 # all_data = fetch_from_export_api()
 # write_to_file(all_data) 
 
 # Later, if you want to get new highlights updated since your last fetch of allData, do this.
-last_fetch_was_at = datetime.datetime.now() - datetime.timedelta(days=1)  # use your own stored date
+# day comes in format like 2023-07-25 and is in variable DAY_LAST_FETCHED
+# calculate today minus DAY_LAST_FETCHED
+
+day_delta = datetime.datetime.now() - datetime.datetime.strptime(DAY_LAST_FETCHED, '%Y-%m-%d')
+
+last_fetch_was_at = datetime.datetime.now() - datetime.timedelta(days=day_delta.days)  # use your own stored date
 new_data = fetch_from_export_api(last_fetch_was_at.isoformat())
 write_to_file(new_data)
 
