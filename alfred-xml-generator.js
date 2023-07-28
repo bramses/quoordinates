@@ -15,18 +15,6 @@ echo "<?xml version='1.0'?><items>"
 echo "</items>"
 */
 
-// const convertToAlfred = async (query) => {
-//     let idIndex = 0
-//     const results = await similaritySearch(query)
-//     const sortedResults = results.sort((a, b) => b.similarity - a.similarity)
-//     console.log("<?xml version='1.0'?><items>")
-//     for (const result of sortedResults) {
-//         console.log(`<item uid='${idIndex}' arg='${result.text}' query='${query}' valid='YES'><title>${result.text}</title><subtitle>${result.title} - ${result.similarity}</subtitle></item>`)
-//         idIndex++
-//     }
-//     console.log("</items>")
-// }
-
 
 const convertToAlfred = async (query) => {
     let idIndex = 0;
