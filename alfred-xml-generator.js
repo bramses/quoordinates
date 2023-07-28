@@ -2,6 +2,7 @@
 import dotenv from 'dotenv'
 import xml2js from 'xml2js'
 import { similaritySearch } from './similarity-search.js'
+import fs from 'fs'
 
 dotenv.config()
 
@@ -17,32 +18,61 @@ echo "</items>"
 
 
 const convertToAlfred = async (query) => {
-    let idIndex = 0;
-    const results = await similaritySearch(query);
-    const sortedResults = results.sort((a, b) => b.similarity - a.similarity);
+    try {
+        let idIndex = 0;
+        const results = await similaritySearch(query);
+        const sortedResults = results.sort((a, b) => b.similarity - a.similarity);
+    
+        const items = sortedResults.map(result => ({
+            '$': {
+                uid: idIndex++,
+                arg: result.text,
+                query: query,
+                valid: 'YES',
+            },
+            title: [result.text],
+            subtitle: [`${result.title} - ${result.similarity}`]
+        }));
+    
+        const builder = new xml2js.Builder();
+        const xml = builder.buildObject({ items: { item: items } });
+    
+        console.log(xml); // alfred will read this from stdout
 
-    const items = sortedResults.map(result => ({
-        '$': {
-            uid: idIndex++,
-            arg: result.text,
-            query: query,
-            valid: 'YES',
-        },
-        title: [result.text],
-        subtitle: [`${result.title} - ${result.similarity}`]
-    }));
-
-    const builder = new xml2js.Builder();
-    const xml = builder.buildObject({ items: { item: items } });
-
-    console.log(xml);
+        return results
+    } catch (err) {
+        return err
+    }
 }
 
-// run semantic search on terminal arg (include spaces) and remove the ? at the end
-convertToAlfred(process.argv.slice(2).join(" ").replace("?", ""))
+const writeToLogFile = (query, results) => {
+    // capture json of query and results in log file
+    const logPath = process.env.LOG_PATH
 
-// async anonomous function
-// (async () => {
-//     const s = await similaritySearch(process.argv.slice(2).join(" ").replace("?", ""))
-//     console.log(s)
-// })()
+    const log = {
+        query,
+        timestamp: new Date(),
+        results
+    }
+
+    // get existing log
+    const existingLog = fs.existsSync(logPath) ? fs.readFileSync(logPath) : ""
+
+
+
+
+    fs.writeFileSync(logPath, existingLog + "\n\n" + "```json\n" + JSON.stringify(log, null, 2) + "\n```")
+}
+
+
+
+
+(async () => {
+    // run semantic search on terminal arg (include spaces) and remove the ? at the end
+    const query = process.argv.slice(2).join(" ").replace("?", "")
+    const results = await convertToAlfred(query)
+    writeToLogFile(query, results)
+})()
+
+
+
