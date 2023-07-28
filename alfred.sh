@@ -16,40 +16,54 @@ if [[ $user_input == *'?' ]]; then
         python3 - <<EOF
 import lxml.etree as ET
 import html
+import traceback
 
-query = '''$user_input'''
+try:
+    query = '''$user_input'''
 
-# Parse XML with recovery mode
-parser = ET.XMLParser(recover=True)
-root = ET.fromstring('''$XML''', parser=parser)
-items = root.findall('item')
+    # Parse XML with recovery mode
+    parser = ET.XMLParser(recover=True)
+    root = ET.fromstring('''$XML''', parser=parser)
+    items = root.findall('item')
 
-# Extract data
-data = []
-for item in items:
-    title_element = item.find('title')
-    subtitle_element = item.find('subtitle')
-    # Skip this item if it doesn't have both a title and a subtitle
-    if title_element is None or subtitle_element is None:
-        continue
-    text = html.escape(title_element.text)
-    title, similarity_str = html.escape(subtitle_element.text).split(" - ")
-    similarity = float(similarity_str)
-    data.append((text, title, similarity))
+    # Extract data
+    data = []
+    for item in items:
+        title_element = item.find('title')
+        subtitle_element = item.find('subtitle')
+        # Skip this item if it doesn't have both a title and a subtitle
+        if title_element is None or subtitle_element is None:
+            continue
+        text = html.escape(title_element.text)
+        title, similarity_str = html.escape(subtitle_element.text).rsplit(" - ", 1)
+        similarity = float(similarity_str)
+        data.append((text, title, similarity))
 
-# Sort by similarity
-data.sort(key=lambda x: x[2], reverse=True)
+    # Sort by similarity
+    data.sort(key=lambda x: x[2], reverse=True)
 
-# Format output
-results = [f"## {query}\\n\\n"]
-for text, title, similarity in data[:3]:  # Top 3
-    result = f"> {text}\\n> -- <cite>{title}</cite>\\n\\nsimilarity = {similarity}\\n\\n---\\n"
-    results.append(result)
+    # Format output
+    results = [f"## {query}\\n\\n"]
+    for text, title, similarity in data[:3]:  # Top 3
+        text = html.unescape(text)
+        title = html.unescape(title)
+        result = f"> {text}\\n> -- <cite>{title}</cite>\\n\\nsimilarity = {similarity}\\n\\n---\\n"
+        results.append(result)
 
-# Convert list of results to a single string
-RESULTS = "\\n".join(results)
+    # Format output
+    # results = [f"## {query}\\n\\n"]
+    # for text, title, similarity in data[:3]:  # Top 3
+        # result = f"> {text}\\n> -- <cite>{title}</cite>\\n\\nsimilarity = {similarity}\\n\\n---\\n"
+        # results.append(result)
 
-print(RESULTS)
+    # Convert list of results to a single string
+    RESULTS = "\\n".join(results)
+
+    print(RESULTS)
+
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+    traceback.print_exc()
 EOF
     )
 
