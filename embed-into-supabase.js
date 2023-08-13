@@ -10,7 +10,7 @@ const configuration = new Configuration({
     organization: process.env.OPENAI_ORG,
   });
   
-  const openai = new OpenAIApi(configuration);
+const openai = new OpenAIApi(configuration);
 
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
