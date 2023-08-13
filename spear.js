@@ -17,10 +17,10 @@ const isRelevantPromptExplain = (query, text) =>
   `Given the query: "${query}", is the following text relevant? "${text}". Yes or no? Explain why.`;
 const isRelevantPrompt = (query, text) =>
   `Given the query: "${query}", is the following text relevant? "${text}". Yes or no? Only answer yes if the text is relevant to the query. If the text is not relevant, answer no.`;
-const stitchResultsPrompt = (results) =>
+const stitchResultsPrompt = (query, results) =>
   `You are a PHD student (so your knowledge is very good, and you have a great grasp on grammar and understanding relationships between concepts) tasked with the following: Using the following quotes understand their meaning and link them together into a one paragraph coherent summary. Re-arrange them in any way that makes the most coherent point from all of them combined, telling a story of sorts, just explain the logic that connects them: ${results.join(
     " "
-  )}. Cite book titles with in parentheses next to the part relevant to parent quote. Remember you do not have to use the quotes in the order they were given and might be better switching them around.`;
+  )}. Cite book titles with in parentheses next to the part relevant to parent quote. Remember you do not have to use the quotes in the order they were given and might be better switching them around. Here is the query to frame your answer around: "${query}". Make sure to think it out and read each quote carefully.`;
 
 const getCompletion = async (prompt, maxTokens = 64) => {
   const completion = await openai.createChatCompletion({
@@ -78,7 +78,7 @@ const spear = async (query) => {
   console.log(filteredResults);
   console.log(filteredResults.length);
   const stitchedResults = await getCompletion(
-    stitchResultsPrompt(filteredResults)
+    stitchResultsPrompt(query, filteredResults)
   );
   console.log(stitchedResults);
 };
