@@ -31,6 +31,7 @@ const getCompletion = async (prompt, maxTokens = 64) => {
 };
 
 const spear = async (query) => {
+  console.log(`Running query: ${query}`);
   const prompt = fiveWhysPrompt(query);
   const completion = await getCompletion(prompt);
   const queries = completion
