@@ -20,11 +20,11 @@ const isRelevantPrompt = (query, text) =>
 const stitchResultsPrompt = (query, results) =>
   `You are a PHD student (so your knowledge is very good, and you have a great grasp on grammar and understanding relationships between concepts) tasked with the following: Using the following quotes understand their meaning and link them together into a one paragraph coherent summary. Re-arrange them in any way that makes the most coherent point from all of them combined, telling a story of sorts, just explain the logic that connects them: ${results.join(
     " "
-  )}. Cite book titles with in parentheses next to the part relevant to parent quote. Remember you do not have to use the quotes in the order they were given and might be better switching them around. Here is the query to frame your answer around: "${query}". Make sure to think it out and read each quote carefully.`;
+  )}. Remember you do not have to use the quotes in the order they were given and might be better switching them around. Here is the query to frame your answer around: "${query}". Make sure to think it out and read each quote carefully.`;
 
 const getCompletion = async (prompt, maxTokens = 64) => {
   const completion = await openai.createChatCompletion({
-    model: "gpt-4",
+    model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: prompt }],
   });
   return completion.data.choices[0].message.content;
@@ -62,7 +62,7 @@ const spear = async (query) => {
     setOfQuotes.add(topResult.text);
     return `> ${topResult.text}\n\n--<cite>${topResult.title}</cite>\n\n`;
   });
-//   console.log(topResults);
+
   const filterResultsByRelevance = async (queries, results) => {
     const filteredResults = [];
     for (let i = 0; i < results.length; i++) {
@@ -77,6 +77,10 @@ const spear = async (query) => {
   const filteredResults = await filterResultsByRelevance(queries, topResults);
   console.log(filteredResults);
   console.log(filteredResults.length);
+  if (filteredResults.length < 1) {
+    console.log("Not enough results to stitch together.");
+    return;
+  }
   const stitchedResults = await getCompletion(
     stitchResultsPrompt(query, filteredResults)
   );
