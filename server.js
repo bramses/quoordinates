@@ -42,7 +42,9 @@ app.post('/share', async (req, res) => {
     const url = req.body.url
     const text = req.body.text
     const result = await sharePic(url, text)
-    res.send(result)
+    res.send({
+      result
+    })
 })
 
 app.get('/random', async (req, res) => {
