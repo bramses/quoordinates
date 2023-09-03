@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { similaritySearch } from './similarity-search.js';
 import { sharePic } from './share-pic.js';
+import { fetchRandomHighlight } from './get-random-highlight.js';
 
 
 const app = express();
@@ -41,6 +42,11 @@ app.post('/share', async (req, res) => {
     const url = req.body.url
     const text = req.body.text
     const result = await sharePic(url, text)
+    res.send(result)
+})
+
+app.get('/random', async (req, res) => {
+    const result = await fetchRandomHighlight()
     res.send(result)
 })
 
