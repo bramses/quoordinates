@@ -11,6 +11,8 @@ python-dotenv = "^1.0.0"
 requests = "^2.31.0"
 nomic = "^2.0.5"
 supabase = "^1.0.3"
+bs4 = "^0.0.1"
+selenium = "^4.12.0"
 
 
 [build-system]
