@@ -150,8 +150,8 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const rectWidth = 1024 * 0.84;
-    const rectHeight = 1024 * 1;
+    const rectWidth = 1024 * 0.92;
+    const rectHeight = 1024 * 0.92;
     const rectX = (1024 - rectWidth) / 2;
     const rectY = (1024 - rectHeight) / 2;
 
@@ -347,7 +347,7 @@ async function testMain() {
   }
 }
 
-// testMain();
+testMain();
 
 // sharePic(
 //   "https://res.cloudinary.com/dtgh01qqo/image/upload/v1624293899/img-4E6wH8ITwi3WJCGq9txRKb8C.png",
