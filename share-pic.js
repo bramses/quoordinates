@@ -212,15 +212,33 @@ async function overlayTextOnImage(imageUrl, text) {
     // Determine text color (black)
     ctx.fillStyle = "black";
 
+
     // // Draw each line of text on the right side of the canvas
     // for (let i = 0; i < lines.length; i++) {
     //   ctx.fillText(lines[i], textXStart, 20 + i * (fontSize + 10));
     // }
 
+     // Determine average color of the area where the rectangle will be placed
+     const imageData = ctx.getImageData(rectX, rectY, rectWidth, rectHeight);
+     let r = 0,
+       g = 0,
+       b = 0;
+     for (let i = 0; i < imageData.data.length; i += 4) {
+       r += imageData.data[i];
+       g += imageData.data[i + 1];
+       b += imageData.data[i + 2];
+     }
+     const pixelCount = imageData.data.length / 4;
+     r = Math.floor(r / pixelCount);
+     g = Math.floor(g / pixelCount);
+     b = Math.floor(b / pixelCount);
+ 
+     // make background color of rectangle average color
+     const backgroundColor = `rgb(${r}, ${g}, ${b})`;
     
     // Draw colored rectangle to the left of the text block
-    const rectangleWidth = 10; // Width of the colored rectangle
-    ctx.fillStyle = "black"; // Color of the rectangle
+    const rectangleWidth = 8; // Width of the colored rectangle
+    ctx.fillStyle = backgroundColor; // Color of the rectangle
     // find line that starts with --
     const citationLine = lines.find((line) => line.startsWith("--"));
     const citationIndex = lines.indexOf(citationLine);
