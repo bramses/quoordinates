@@ -151,7 +151,7 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const rectWidth = 1024 * 0.84;
-    const rectHeight = 1024 * 0.84;
+    const rectHeight = 1024 * 1;
     const rectX = (1024 - rectWidth) / 2;
     const rectY = (1024 - rectHeight) / 2;
 
@@ -202,10 +202,12 @@ async function overlayTextOnImage(imageUrl, text) {
 
       // Calculate total block height
       blockHeight = lines.length * (fontSize + 10); // 10px line spacing
-
+      const randomFont = ["Palatino", "Georgia", "Helvetica"].sort(
+        () => 0.5 - Math.random()
+        )[0];
       if (blockHeight > rectHeight) {
-        fontSize -= 5; // Reduce the font size
-        ctx.font = `${fontSize}px Georgia`;
+        fontSize -= 1; // Reduce the font size
+        ctx.font = `${fontSize}px ${randomFont}`;
       }
     } while (blockHeight > rectHeight);
 
@@ -245,7 +247,7 @@ async function overlayTextOnImage(imageUrl, text) {
     const linesBeforeCitation = lines.slice(0, citationIndex);
     const linesAfterCitation = lines.slice(citationIndex);
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
-    ctx.fillRect(textXStart + rectX + 15, rectY + 15, rectangleWidth, rectangleHeight);
+    ctx.fillRect(textXStart + rectX, rectY + 15, rectangleWidth, rectangleHeight);
 
     // Draw each line of text
     ctx.fillStyle = "black";
@@ -334,7 +336,7 @@ async function testMain() {
   try {
     const { buffer } = await overlayTextOnImage(
       "test.png",
-      `Apparatuses behave better and faster than human beings: they assemble automobiles better, they sew better, dig better, and soon will be able to do their cherry-picking more efficiently. And they think better too: they calculate, draw, and make decisions faster. (They are, curiously, better at calculation than they are at cherry-picking.) From now on, people can concentrate on programming apparatuses. Could that not be the freedom we have sought since history began?
+      `There, perched on a cot, I pretended to read. My eyes followed the black signs without skipping a single one, and I told myself a story aloud, being careful to utter all the syllables. I was taken by surprise—or saw to it that I was—a great fuss was made, and the family decided that it was time to teach me the alphabet. I was as zealous as a catechumen. I went so far as to give myself private lessons. I would climb up on my cot with Hector Malot’s No Family, which I knew by heart, and, half reciting, half deciphering, I went through every page of it, one after the other. When the last page was turned, I knew how to read. I was wild with joy. —JEAN-PAUL SARTRE In his memoir The Words, Jean-Paul Sartre recounts his first recollection of reading, and the sheer “wild joy” that accompanied this experience. However filtered through the lens of memory, Sartre’s account is similar to the experience of countless children who also half memorize, half decipher a favorite book until suddenly (or so it seems to them) reading is theirs. The reality is that Sartre steadily accumulated multiple, partial sources of knowledge until “suddenly” a threshold was crossed, and he deciphered the secret language of print.
     
 -- Does Writing Have a Future? (Electronic Mediations Book 33)`
     );
