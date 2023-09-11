@@ -183,8 +183,8 @@ async function overlayTextOnImage(imageUrl, text) {
         for (let i = 0; i < words.length; i++) {
           const word = words[i];
           const width = ctx.measureText(currentLine + " " + word).width;
-          if (width < rectWidth - 40) {
-            // 20px padding on each side
+          if (width < rectWidth - 162) {
+            // ~80px padding on each side
             currentLine += (currentLine ? " " : "") + word;
           } else {
             lines.push(currentLine);
@@ -347,6 +347,7 @@ async function testMain() {
   }
 }
 
+if (process.argv[2] === "test")
 testMain();
 
 // sharePic(

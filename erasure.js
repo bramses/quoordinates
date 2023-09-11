@@ -32,7 +32,6 @@ const strikeThrough = (source, poem) => {
       newSource += "||" + sourceWords[i] + "||" + " ";
     }
   }
-  console.log(newSource);
   return newSource;
 };
 
