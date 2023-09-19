@@ -278,6 +278,7 @@ async function saveImgFromUrl(url) {
     return filename;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -317,17 +318,24 @@ export const sharePicOverlay = async (imageUrl, text) => {
 };
 
 export const sharePic = async (imageUrl, text) => {
-    const dalleFileTemp = await saveImgFromUrl(imageUrl);
-    const { buffer } = await overlayTextOnImage(dalleFileTemp, text);
-    const resultTemp = `${Date.now()}.png`;
-    fs.writeFileSync(resultTemp, buffer);
-    const result = await uploadToCloudflare(resultTemp);
-    console.log(result);
-    // delete temp files from disk
-    deleteFile(dalleFileTemp);
-    deleteFile(resultTemp);
-  
-    return result;
+    try {
+      const dalleFileTemp = await saveImgFromUrl(imageUrl);
+      const { buffer } = await overlayTextOnImage(dalleFileTemp, text);
+      const resultTemp = `${Date.now()}.png`;
+      fs.writeFileSync(resultTemp, buffer);
+      const result = await uploadToCloudflare(resultTemp);
+      console.log(result);
+      // delete temp files from disk
+      deleteFile(dalleFileTemp);
+      deleteFile(resultTemp);
+    
+      return result;
+    } catch (err) {
+      console.error(err)
+      return {
+        error: err
+      };
+    }
   };
 
 // Example usage

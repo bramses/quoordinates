@@ -42,6 +42,14 @@ app.post('/share', async (req, res) => {
     const url = req.body.url
     const text = req.body.text
     const result = await sharePic(url, text)
+
+    if (result.error) {
+        res.status(500).send({
+            error: result.error
+        })
+        return
+    }
+
     res.send({
       result
     })
