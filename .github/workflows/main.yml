@@ -1,0 +1,25 @@
+name: Get Code Diff
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        # This fetch-depth will make sure to fetch the last two commits
+        # so we can diff against them.
+        fetch-depth: 2 
+
+    - name: Get diff
+      run: |
+        # Get the diff against the previous commit.
+        git diff HEAD^ HEAD > diff.txt
+
+    - name: Use the diff
+      run: |
+        # This is an example to display the diff. You can process it as needed.
+        cat diff.txt
