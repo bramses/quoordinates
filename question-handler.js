@@ -106,6 +106,8 @@ const fetchAllRecords = async (table_name, page_size = 1000) => {
     const response = await supabase
       .from(table_name)
       .select("*")
+      // where question column is null
+      .is("question", null)
       .range(current_page * page_size, (current_page + 1) * page_size - 1);
 
     const records = response.data;
@@ -152,9 +154,7 @@ const fetchAllRecords = async (table_name, page_size = 1000) => {
     if(!justSave) {
       let count = 0;
 
-      let pageNum = filter_start_at_page(res, 41701647);
 
-      console.log("filtered len: " + pageNum);
 
       // filter res to only include pages after pageNum
       // res = res.slice(pageNum - 1);
@@ -178,7 +178,7 @@ const fetchAllRecords = async (table_name, page_size = 1000) => {
             await addQuestionToHighlight(row, question);
             console.log(question + " || " + row.text + " || " + row.id);
             // wait 1 second between each request
-            // await new Promise((resolve) => setTimeout(resolve, 1000));
+            //await new Promise((resolve) => setTimeout(resolve, 3500));
           }
         }
       }
