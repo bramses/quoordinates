@@ -150,17 +150,25 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const rectWidth = 1024 * 0.94;
-    const rectHeight = 1024 * 0.96;
+    const rectWidth = 1024 * 0.94; // == 962.56
+    const rectHeight = 1024 * 0.92; // == 942.08
+
+    // center the rectangle in the bottom half 1024, 1024 of the canvas
     const rectX = (1024 - rectWidth) / 2;
-    const rectY = 1024 + (1024 - rectHeight) / 2; // Position the text block under the image
+    const rectY = 1024 + (1024 - rectHeight) / 2; // == 1050.96
+
+
+  // superimpose the rectangle on the canvas as a 1px red border for debugging
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
 
     // Fetch and load the image
     const img = await loadImage(imageUrl);
     ctx.drawImage(img, 0, 0, 1024, 1024); // Draw the image at the top
 
     // Word wrapping logic and text rendering
-    let fontSize = 80;
+    let fontSize = 72;
     ctx.font = `${fontSize}px Helvetica`;
     let lines = [];
     let blockHeight;
@@ -176,7 +184,7 @@ async function overlayTextOnImage(imageUrl, text) {
         for (let i = 0; i < words.length; i++) {
           const word = words[i];
           const width = ctx.measureText(currentLine + " " + word).width;
-          if (width < rectWidth - 38) {
+          if (width < rectWidth - 0) {
             // ~80px padding on each side
             currentLine += (currentLine ? " " : "") + word;
           } else {
@@ -230,8 +238,8 @@ async function overlayTextOnImage(imageUrl, text) {
     const linesAfterCitation = lines.slice(citationIndex);
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
     ctx.fillRect(
-      textXStart + rectX,
-      rectY + fontSize - 15,
+      4,
+      rectY,
       rectangleWidth,
       rectangleHeight
     );
@@ -240,9 +248,16 @@ async function overlayTextOnImage(imageUrl, text) {
     // Draw each line of text in the bottom half
     ctx.fillStyle = "black";
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], rectX + 30, rectY + 40 + i * (fontSize + 10)); // Start drawing 20px below the image
-      // if (i == 0) console.log(rectX + 30, 1024 + 80 + i * (fontSize + 10))
+      // use rectX and rectY to offset the text
+      ctx.fillText(
+        lines[i],
+        rectX + 0,
+        rectY + 0 + fontSize + i * (fontSize + 10)
+      );
     }
+
+    
+
 
     // Convert canvas to buffer
     const buffer = canvas.toBuffer();
