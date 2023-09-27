@@ -143,6 +143,81 @@ async function overlayTextOnImageOverlay(imageUrl, text) {
 
 async function overlayTextOnImage(imageUrl, text) {
   try {
+    const canvas = createCanvas(1024, 2048); // Height is doubled to stack image and text
+    const ctx = canvas.getContext("2d");
+
+    // Fill the canvas with white background
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const rectWidth = 1024 * 0.92;
+    const rectHeight = 1024 * 0.92;
+    const rectX = (1024 - rectWidth) / 2;
+    const rectY = 1024 + (1024 - rectHeight) / 2;  // Position the text block under the image
+
+    // Fetch and load the image
+    const img = await loadImage(imageUrl);
+    ctx.drawImage(img, 0, 0, 1024, 1024); // Draw the image at the top
+
+    // Word wrapping logic and text rendering
+    let fontSize = 80;
+    ctx.font = `${fontSize}px Georgia`;
+    let lines = [];
+    let blockHeight;
+
+    do {
+      lines = [];
+      const paragraphs = text.split("\n");
+
+      for (const paragraph of paragraphs) {
+        let currentLine = "";
+        const words = paragraph.split(" ");
+
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i];
+          const width = ctx.measureText(currentLine + " " + word).width;
+          if (width < rectWidth - 162) {  // ~80px padding on each side
+            currentLine += (currentLine ? " " : "") + word;
+          } else {
+            lines.push(currentLine);
+            currentLine = word;
+          }
+        }
+        lines.push(currentLine);
+        lines.push("");  // Empty line to simulate paragraph spacing
+      }
+
+      // Remove the last empty line
+      if (lines[lines.length - 1] === "") {
+        lines.pop();
+      }
+
+      // Calculate total block height
+      blockHeight = lines.length * (fontSize + 10);  // 10px line spacing
+      if (blockHeight > rectHeight) {
+        fontSize -= 1;  // Reduce the font size
+        ctx.font = `${fontSize}px Georgia`;  // Maintain the original font for simplicity
+      }
+    } while (blockHeight > rectHeight);
+
+    // Draw each line of text in the bottom half
+    ctx.fillStyle = "black";
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], rectX, 1024 + 20 + i * (fontSize + 10)); // Start drawing 20px below the image
+    }
+
+    // Convert canvas to buffer
+    const buffer = canvas.toBuffer();
+    return { buffer };
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+
+async function overlayTextOnImageHorizontal(imageUrl, text) {
+  try {
     const canvas = createCanvas(2048, 1024); // Width is doubled to accommodate the image and text
     const ctx = canvas.getContext("2d");
 

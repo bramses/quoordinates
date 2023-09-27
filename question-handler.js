@@ -16,6 +16,7 @@ const configuration = new Configuration({
   organization: process.env.OPENAI_ORG,
 });
 
+console.log("org: " + process.env.OPENAI_ORG);
 const openai = new OpenAIApi(configuration);
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -32,6 +33,8 @@ const generateQuestion = async (row) => {
     const highlight = row.text;
 
     const prompt = `Generate a single question from this quote. The end user cannot see the quote so DO NOT use any abstract concepts like "the speaker" or "the writer" in your question. BE EXPLICIT. DO NOT ASSUME the reader has read the quote. DO NOT use passive voice and do not use passive pronouns like he/she/they/him/her etc. You can use any of who/what/where/when/why. Say nothing else.\n\nQuote:\n\n${highlight}\n\nQ:`;
+
+    console.log("prompt: " + highlight);
     const completion = await openai.createChatCompletion({
       messages: [
         {
@@ -46,6 +49,7 @@ const generateQuestion = async (row) => {
 
     return content;
   } catch (err) {
+    console.log("START ERROR")
     console.error(err);
     console.error(err.response);
     console.error(err.response.data);
@@ -54,6 +58,7 @@ const generateQuestion = async (row) => {
     console.error(err.response.data.error.code);
     console.error(err.response.data.error.status);
     console.error(err.response.data.error.request);
+    console.log("END ERROR")
     throw err;
   }
 };
@@ -66,6 +71,7 @@ const addQuestionToHighlight = async (row, question) => {
       .update({ question })
       .match({ id: row.id });
   } catch (err) {
+    console.log("Error adding question to highlight");
     console.error(err);
     throw err;
   }
@@ -178,7 +184,7 @@ const fetchAllRecords = async (table_name, page_size = 1000) => {
             await addQuestionToHighlight(row, question);
             console.log(question + " || " + row.text + " || " + row.id);
             // wait 1 second between each request
-            //await new Promise((resolve) => setTimeout(resolve, 3500));
+            // await new Promise((resolve) => setTimeout(resolve, 500));
           }
         }
       }
