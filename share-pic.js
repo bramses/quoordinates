@@ -463,17 +463,17 @@ export const sharePic = async (imageUrl, text) => {
     const verticalResult = await uploadToCloudflare(resultTemp);
     console.log(result);
     // delete temp files from disk
-    deleteFile(dalleFileTemp);
+    // deleteFile(dalleFileTemp);
     deleteFile(resultTemp);
 
     const { bufferH } = await overlayTextOnImageHorizontal(dalleFileTemp, text);
     const resultTempH = `${Date.now()}.png`;
     fs.writeFileSync(resultTempH, bufferH);
-    const horizontalResult = await uploadToCloudflare(resultTemp);
+    const horizontalResult = await uploadToCloudflare(resultTempH);
     console.log(result);
     // delete temp files from disk
     deleteFile(dalleFileTemp);
-    deleteFile(resultTemp);
+    deleteFile(resultTempH);
 
 
     return {
