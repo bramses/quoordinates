@@ -150,10 +150,10 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const rectWidth = 1024 * 0.92;
+    const rectWidth = 1024 * 0.999;
     const rectHeight = 1024 * 0.92;
     const rectX = (1024 - rectWidth) / 2;
-    const rectY = 1024 + (1024 - rectHeight) / 2;  // Position the text block under the image
+    const rectY = 1024 + (1024 - rectHeight) / 2; // Position the text block under the image
 
     // Fetch and load the image
     const img = await loadImage(imageUrl);
@@ -161,7 +161,7 @@ async function overlayTextOnImage(imageUrl, text) {
 
     // Word wrapping logic and text rendering
     let fontSize = 80;
-    ctx.font = `${fontSize}px Georgia`;
+    ctx.font = `${fontSize}px Helvetica`;
     let lines = [];
     let blockHeight;
 
@@ -176,7 +176,8 @@ async function overlayTextOnImage(imageUrl, text) {
         for (let i = 0; i < words.length; i++) {
           const word = words[i];
           const width = ctx.measureText(currentLine + " " + word).width;
-          if (width < rectWidth - 162) {  // ~80px padding on each side
+          if (width < rectWidth - 38) {
+            // ~80px padding on each side
             currentLine += (currentLine ? " " : "") + word;
           } else {
             lines.push(currentLine);
@@ -184,7 +185,7 @@ async function overlayTextOnImage(imageUrl, text) {
           }
         }
         lines.push(currentLine);
-        lines.push("");  // Empty line to simulate paragraph spacing
+        lines.push(""); // Empty line to simulate paragraph spacing
       }
 
       // Remove the last empty line
@@ -193,17 +194,53 @@ async function overlayTextOnImage(imageUrl, text) {
       }
 
       // Calculate total block height
-      blockHeight = lines.length * (fontSize + 10);  // 10px line spacing
+      blockHeight = lines.length * (fontSize + 10); // 10px line spacing
       if (blockHeight > rectHeight) {
-        fontSize -= 1;  // Reduce the font size
-        ctx.font = `${fontSize}px Georgia`;  // Maintain the original font for simplicity
+        fontSize -= 1; // Reduce the font size
+        ctx.font = `${fontSize}px Helvetica`; // Maintain the original font for simplicity
       }
     } while (blockHeight > rectHeight);
+
+    const textXStart = 0; // Start drawing text at X=1044 to place it on the right side
+
+    const imageData = ctx.getImageData(0, 0, 1024, 1024);
+    let r = 0,
+      g = 0,
+      b = 0;
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      r += imageData.data[i];
+      g += imageData.data[i + 1];
+      b += imageData.data[i + 2];
+    }
+    const pixelCount = imageData.data.length / 4;
+    r = Math.floor(r / pixelCount);
+    g = Math.floor(g / pixelCount);
+    b = Math.floor(b / pixelCount);
+
+    // make background color of rectangle average color
+    const backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+    // Draw colored rectangle to the left of the text block
+    const rectangleWidth = 8; // Width of the colored rectangle
+    ctx.fillStyle = backgroundColor; // Color of the rectangle
+    // find line that starts with --
+    const citationLine = lines.find((line) => line.startsWith("--"));
+    const citationIndex = lines.indexOf(citationLine);
+    const linesBeforeCitation = lines.slice(0, citationIndex);
+    const linesAfterCitation = lines.slice(citationIndex);
+    const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
+    ctx.fillRect(
+      textXStart + rectX,
+      rectY + 15,
+      rectangleWidth,
+      rectangleHeight
+    );
+
 
     // Draw each line of text in the bottom half
     ctx.fillStyle = "black";
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], rectX, 1024 + 80 + i * (fontSize + 10)); // Start drawing 20px below the image
+      ctx.fillText(lines[i], rectX + 30, 1024 + 80 + i * (fontSize + 10)); // Start drawing 20px below the image
     }
 
     // Convert canvas to buffer
@@ -214,7 +251,6 @@ async function overlayTextOnImage(imageUrl, text) {
     return null;
   }
 }
-
 
 async function overlayTextOnImageHorizontal(imageUrl, text) {
   try {
@@ -279,7 +315,7 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
       blockHeight = lines.length * (fontSize + 10); // 10px line spacing
       const randomFont = ["Palatino", "Georgia", "Helvetica"].sort(
         () => 0.5 - Math.random()
-        )[0];
+      )[0];
       if (blockHeight > rectHeight) {
         fontSize -= 1; // Reduce the font size
         ctx.font = `${fontSize}px ${randomFont}`;
@@ -289,30 +325,29 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
     // Determine text color (black)
     ctx.fillStyle = "black";
 
-
     // // Draw each line of text on the right side of the canvas
     // for (let i = 0; i < lines.length; i++) {
     //   ctx.fillText(lines[i], textXStart, 20 + i * (fontSize + 10));
     // }
 
-     // Determine average color of the area where the rectangle will be placed
-     const imageData = ctx.getImageData(rectX, rectY, rectWidth, rectHeight);
-     let r = 0,
-       g = 0,
-       b = 0;
-     for (let i = 0; i < imageData.data.length; i += 4) {
-       r += imageData.data[i];
-       g += imageData.data[i + 1];
-       b += imageData.data[i + 2];
-     }
-     const pixelCount = imageData.data.length / 4;
-     r = Math.floor(r / pixelCount);
-     g = Math.floor(g / pixelCount);
-     b = Math.floor(b / pixelCount);
- 
-     // make background color of rectangle average color
-     const backgroundColor = `rgb(${r}, ${g}, ${b})`;
-    
+    // Determine average color of the area where the rectangle will be placed
+    const imageData = ctx.getImageData(rectX, rectY, rectWidth, rectHeight);
+    let r = 0,
+      g = 0,
+      b = 0;
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      r += imageData.data[i];
+      g += imageData.data[i + 1];
+      b += imageData.data[i + 2];
+    }
+    const pixelCount = imageData.data.length / 4;
+    r = Math.floor(r / pixelCount);
+    g = Math.floor(g / pixelCount);
+    b = Math.floor(b / pixelCount);
+
+    // make background color of rectangle average color
+    const backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
     // Draw colored rectangle to the left of the text block
     const rectangleWidth = 8; // Width of the colored rectangle
     ctx.fillStyle = backgroundColor; // Color of the rectangle
@@ -322,14 +357,23 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
     const linesBeforeCitation = lines.slice(0, citationIndex);
     const linesAfterCitation = lines.slice(citationIndex);
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
-    ctx.fillRect(textXStart + rectX, rectY + 15, rectangleWidth, rectangleHeight);
+    ctx.fillRect(
+      textXStart + rectX,
+      rectY + 15,
+      rectangleWidth,
+      rectangleHeight
+    );
 
     // Draw each line of text
     ctx.fillStyle = "black";
     const textX = rectX + rectangleWidth + 10 + 15; // Start drawing text to the right of the colored rectangle
     const textY = rectY + 20 + fontSize; // Start drawing text 20px from the top of the rectangle
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], textXStart + textX + 20, textY + i * (fontSize + 10));
+      ctx.fillText(
+        lines[i],
+        textXStart + textX + 20,
+        textY + i * (fontSize + 10)
+      );
     }
 
     // Convert canvas to buffer
@@ -393,25 +437,25 @@ export const sharePicOverlay = async (imageUrl, text) => {
 };
 
 export const sharePic = async (imageUrl, text) => {
-    try {
-      const dalleFileTemp = await saveImgFromUrl(imageUrl);
-      const { buffer } = await overlayTextOnImage(dalleFileTemp, text);
-      const resultTemp = `${Date.now()}.png`;
-      fs.writeFileSync(resultTemp, buffer);
-      const result = await uploadToCloudflare(resultTemp);
-      console.log(result);
-      // delete temp files from disk
-      deleteFile(dalleFileTemp);
-      deleteFile(resultTemp);
-    
-      return result;
-    } catch (err) {
-      console.error(err)
-      return {
-        error: err
-      };
-    }
-  };
+  try {
+    const dalleFileTemp = await saveImgFromUrl(imageUrl);
+    const { buffer } = await overlayTextOnImage(dalleFileTemp, text);
+    const resultTemp = `${Date.now()}.png`;
+    fs.writeFileSync(resultTemp, buffer);
+    const result = await uploadToCloudflare(resultTemp);
+    console.log(result);
+    // delete temp files from disk
+    deleteFile(dalleFileTemp);
+    deleteFile(resultTemp);
+
+    return result;
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+    };
+  }
+};
 
 // Example usage
 
@@ -430,8 +474,7 @@ async function testMain() {
   }
 }
 
-if (process.argv[2] === "test")
-testMain();
+if (process.argv[2] === "test") testMain();
 
 // sharePic(
 //   "https://res.cloudinary.com/dtgh01qqo/image/upload/v1624293899/img-4E6wH8ITwi3WJCGq9txRKb8C.png",
