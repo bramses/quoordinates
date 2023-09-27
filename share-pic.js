@@ -203,7 +203,7 @@ async function overlayTextOnImage(imageUrl, text) {
     // Draw each line of text in the bottom half
     ctx.fillStyle = "black";
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], rectX, 1024 + 20 + i * (fontSize + 10)); // Start drawing 20px below the image
+      ctx.fillText(lines[i], rectX, 1024 + 80 + i * (fontSize + 10)); // Start drawing 20px below the image
     }
 
     // Convert canvas to buffer
