@@ -159,9 +159,9 @@ async function overlayTextOnImage(imageUrl, text) {
 
 
   // superimpose the rectangle on the canvas as a 1px red border for debugging
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+    // ctx.strokeStyle = "red";
+    // ctx.lineWidth = 1;
+    // ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
 
     // Fetch and load the image
     const img = await loadImage(imageUrl);
@@ -238,7 +238,7 @@ async function overlayTextOnImage(imageUrl, text) {
     const linesAfterCitation = lines.slice(citationIndex);
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
     ctx.fillRect(
-      4,
+      12,
       rectY,
       rectangleWidth,
       rectangleHeight
