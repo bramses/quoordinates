@@ -238,7 +238,7 @@ async function overlayTextOnImage(imageUrl, text) {
     const linesAfterCitation = lines.slice(citationIndex);
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
     ctx.fillRect(
-      12,
+      8,
       rectY,
       rectangleWidth,
       rectangleHeight
