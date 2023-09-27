@@ -150,7 +150,7 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const rectWidth = 1024 * 0.999;
+    const rectWidth = 1024 * 0.94;
     const rectHeight = 1024 * 0.92;
     const rectX = (1024 - rectWidth) / 2;
     const rectY = 1024 + (1024 - rectHeight) / 2; // Position the text block under the image
@@ -201,7 +201,7 @@ async function overlayTextOnImage(imageUrl, text) {
       }
     } while (blockHeight > rectHeight);
 
-    const textXStart = 0; // Start drawing text at X=1044 to place it on the right side
+    const textXStart = 4; // Start drawing text at X=1044 to place it on the right side
 
     const imageData = ctx.getImageData(0, 0, 1024, 1024);
     let r = 0,
