@@ -461,7 +461,6 @@ export const sharePic = async (imageUrl, text) => {
     const resultTemp = `${Date.now()}.png`;
     fs.writeFileSync(resultTemp, buffer);
     const verticalResult = await uploadToCloudflare(resultTemp);
-    console.log(result);
     // delete temp files from disk
     // deleteFile(dalleFileTemp);
     deleteFile(resultTemp);
@@ -470,7 +469,6 @@ export const sharePic = async (imageUrl, text) => {
     const resultTempH = `${Date.now()}.png`;
     fs.writeFileSync(resultTempH, bufferH);
     const horizontalResult = await uploadToCloudflare(resultTempH);
-    console.log(result);
     // delete temp files from disk
     deleteFile(dalleFileTemp);
     deleteFile(resultTempH);
