@@ -151,7 +151,7 @@ async function overlayTextOnImage(imageUrl, text) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const rectWidth = 1024 * 0.94;
-    const rectHeight = 1024 * 0.92;
+    const rectHeight = 1024 * 0.96;
     const rectX = (1024 - rectWidth) / 2;
     const rectY = 1024 + (1024 - rectHeight) / 2; // Position the text block under the image
 
@@ -201,7 +201,7 @@ async function overlayTextOnImage(imageUrl, text) {
       }
     } while (blockHeight > rectHeight);
 
-    const textXStart = 4; // Start drawing text at X=1044 to place it on the right side
+    const textXStart = 2; // Start drawing text at X=1044 to place it on the right side
 
     const imageData = ctx.getImageData(0, 0, 1024, 1024);
     let r = 0,
@@ -231,7 +231,7 @@ async function overlayTextOnImage(imageUrl, text) {
     const rectangleHeight = (linesBeforeCitation.length - 3) * (fontSize + 10); // Exclude the last line (citation)
     ctx.fillRect(
       textXStart + rectX,
-      rectY + 15,
+      rectY + fontSize - 15,
       rectangleWidth,
       rectangleHeight
     );
@@ -240,7 +240,8 @@ async function overlayTextOnImage(imageUrl, text) {
     // Draw each line of text in the bottom half
     ctx.fillStyle = "black";
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], rectX + 30, 1024 + 80 + i * (fontSize + 10)); // Start drawing 20px below the image
+      ctx.fillText(lines[i], rectX + 30, rectY + 40 + i * (fontSize + 10)); // Start drawing 20px below the image
+      // if (i == 0) console.log(rectX + 30, 1024 + 80 + i * (fontSize + 10))
     }
 
     // Convert canvas to buffer
@@ -274,8 +275,12 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
     // Word wrapping logic and text rendering remain largely the same
     // with the exception of adjusting the X coordinates.
 
+    // const randomFont = ["Palatino", "Georgia", "Helvetica"].sort(
+    //   () => 0.5 - Math.random()
+    // )[0];
+
     let fontSize = 80;
-    ctx.font = `${fontSize}px Georgia`;
+    ctx.font = `${fontSize}px Helvetica`;
     let lines = [];
     let blockHeight;
 
@@ -313,12 +318,10 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
 
       // Calculate total block height
       blockHeight = lines.length * (fontSize + 10); // 10px line spacing
-      const randomFont = ["Palatino", "Georgia", "Helvetica"].sort(
-        () => 0.5 - Math.random()
-      )[0];
+      
       if (blockHeight > rectHeight) {
         fontSize -= 1; // Reduce the font size
-        ctx.font = `${fontSize}px ${randomFont}`;
+        ctx.font = `${fontSize}px Helvetica`;
       }
     } while (blockHeight > rectHeight);
 
