@@ -395,8 +395,8 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
     }
 
     // Convert canvas to buffer
-    const buffer = canvas.toBuffer();
-    return { buffer };
+    const bufferH = canvas.toBuffer();
+    return { bufferH };
   } catch (err) {
     console.error(err);
     return null;
@@ -462,8 +462,7 @@ export const sharePic = async (imageUrl, text) => {
     const resultTemp = `${Date.now()}.png`;
     fs.writeFileSync(resultTemp, buffer);
     const verticalResult = await uploadToCloudflare(resultTemp);
-    // delete temp files from disk
-    // deleteFile(dalleFileTemp);
+
     
 
     const { bufferH } = await overlayTextOnImageHorizontal(dalleFileTemp, text);
