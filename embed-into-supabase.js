@@ -29,6 +29,41 @@ export const getEmbedding = async (text) => {
     return response.data.data[0].embedding
 }
 
+const generateQuestion = async (text) => {
+    try {
+      const highlight = text;
+  
+      const prompt = `Generate a single question from this quote. The end user cannot see the quote so DO NOT use any abstract concepts like "the speaker" or "the writer" in your question. BE EXPLICIT. DO NOT ASSUME the reader has read the quote. DO NOT use passive voice and do not use passive pronouns like he/she/they/him/her etc. You can use any of who/what/where/when/why. Say nothing else.\n\nQuote:\n\n${highlight}\n\nQ:`;
+  
+      console.log("prompt: " + highlight);
+      const completion = await openai.createChatCompletion({
+        messages: [
+          {
+            role: "system",
+            content: prompt,
+          },
+        ],
+        model: "gpt-3.5-turbo",
+      });
+  
+      const content = completion.data.choices[0].message.content;
+  
+      return content;
+    } catch (err) {
+      console.log("START ERROR")
+      console.error(err);
+      console.error(err.response);
+      console.error(err.response.data);
+      console.error(err.response.data.error);
+      console.error(err.response.data.error.message);
+      console.error(err.response.data.error.code);
+      console.error(err.response.data.error.status);
+      console.error(err.response.data.error.request);
+      console.log("END ERROR")
+      throw err;
+    }
+  };
+
 const convertReadwiseHighlightsToSupabase = async (data) => {
     for (const highlightWrapper of data) {
         const highlights = highlightWrapper.highlights
@@ -107,6 +142,7 @@ const convertReadwiseHighlightsToSupabase = async (data) => {
 
             if (!highlightExists.data.length > 0) {
                 const embeddingArr = await getEmbedding(text)
+                const question = await generateQuestion(text)
 
                 const { data, error } = await supabase.from('highlights').insert({
                     text,
@@ -116,7 +152,8 @@ const convertReadwiseHighlightsToSupabase = async (data) => {
                     readwise_url,
                     book_id,
                     embedding: embeddingArr,
-                    id
+                    id,
+                    question
                 })
 
                 if (error) {
@@ -141,6 +178,27 @@ const justBooks = async () => {
     // read data.json using fs
     const data = JSON.parse(fs.readFileSync('data.json', 'utf8'))
     const filteredData = filterHighlightsByCategory(data, "books")
+    /*
+    map over filteredData and aggregate by title to create the following MD string log:
+    **New Quotes Added!**\n\nfor(title in titles){num_quotes in json} from {title}
+    */
+    const titles = {}
+    for (const book of filteredData) {
+        if (!titles[book.title]) {
+            titles[book.title] = {}
+            titles[book.title]["numHighlights"] = book.highlights.length
+            titles[book.title]["author"] = book.author
+        }
+    }
+
+    let mdString = "**New Quotes Added!**\n\n"
+    for (const title in titles) {
+        mdString += `**${titles[title].numHighlights} quotes** from *${title}* by ${titles[title].author}\n`
+    }
+
+
+    console.log(mdString)
+
     await convertReadwiseHighlightsToSupabase(filteredData)
 
     // log the number of highlights to see if it matches the number of highlights in the readwise account
