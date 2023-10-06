@@ -58,7 +58,7 @@ app.post('/share', async (req, res) => {
 app.post('/random', async (req, res) => {
     let amount = 1
     if (req.body.amount)
-        amount = req.amount
+        amount = req.body.amount
     const result = await fetchRandomHighlight(amount)
     res.send(result)
 })
