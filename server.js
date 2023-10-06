@@ -38,7 +38,7 @@ app.post('/search', async (req, res) => {
 })
 
 app.post('/share', async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const url = req.body.url
     const text = req.body.text
     const result = await sharePic(url, text)
@@ -55,9 +55,9 @@ app.post('/share', async (req, res) => {
     })
 })
 
-app.get('/random', async (req, res) => {
+app.post('/random', async (req, res) => {
     let amount = 1
-    if (req.amount)
+    if (req.body.amount)
         amount = req.amount
     const result = await fetchRandomHighlight(amount)
     res.send(result)
