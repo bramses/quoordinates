@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { similaritySearch } from './similarity-search.js';
 import { sharePic } from './share-pic.js';
-import { fetchRandomHighlight } from './get-random-highlight.js';
+import { fetchRandomHighlight, fetchRandomHighlightInBookID } from './get-random-highlight.js';
 
 
 const app = express();
@@ -60,6 +60,17 @@ app.post('/random', async (req, res) => {
     if (req.body.amount)
         amount = req.body.amount
     const result = await fetchRandomHighlight(amount)
+    res.send(result)
+})
+
+app.post('/random-in-book', async (req, res) => {
+    let amount = 1
+    if (req.body.amount)
+        amount = req.body.amount
+    const book_ids = req.body.book_ids
+
+
+    const result = await fetchRandomHighlightInBookID(book_ids, amount)
     res.send(result)
 })
 
