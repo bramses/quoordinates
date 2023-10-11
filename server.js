@@ -45,7 +45,7 @@ app.post('/add-thought', async (req, res) => {
     const userId = req.body.userId
     const result = await addThoughtToHighlight(highlightId, thought, userId)
     res.send(result)
-}
+})
 
 app.post('/share', async (req, res) => {
     // console.log(req.body)
