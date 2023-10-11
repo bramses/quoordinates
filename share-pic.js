@@ -145,6 +145,8 @@ async function overlayTextOnImage(imageUrl, text) {
   try {
     const canvas = createCanvas(1024, 2048); // Height is doubled to stack image and text
     const ctx = canvas.getContext("2d");
+    ctx.textRendering = "geometricPrecision";
+
 
     // Fill the canvas with white background
     ctx.fillStyle = "white";
@@ -272,6 +274,8 @@ async function overlayTextOnImageHorizontal(imageUrl, text) {
   try {
     const canvas = createCanvas(2048, 1024); // Width is doubled to accommodate the image and text
     const ctx = canvas.getContext("2d");
+    ctx.textRendering = "geometricPrecision";
+
 
     // Fill the canvas with white background
     ctx.fillStyle = "white";
