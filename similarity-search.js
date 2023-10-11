@@ -40,7 +40,9 @@ export const similaritySearch = async (query) => {
         res.push({
             text: highlights[0].text,
             title: books[0].title,
-            similarity: document.similarity
+            similarity: document.similarity,
+            id: highlights[0].id,
+            author: books[0].author,
         })
     }
 
