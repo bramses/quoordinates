@@ -43,6 +43,7 @@ export const similaritySearch = async (query) => {
             similarity: document.similarity,
             id: highlights[0].id,
             author: books[0].author,
+            thoughts: highlights[0].thoughts,
         })
     }
 
