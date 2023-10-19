@@ -1,6 +1,7 @@
 import axios from "axios";
 // fs promises
 import { promises as fsPromises } from "fs";
+import fs from "fs";
 const { readFile } = fsPromises;
 import FormData from "form-data";
 import convert from "heic-convert";
@@ -23,6 +24,16 @@ async function saveImgFromUrl(url) {
   }
 }
 
+async function deleteFile(filename) {
+  try {
+    fs.unlinkSync(filename);
+    return "Deleted file: " + filename;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
 export const dalleImgToCF = async (url = "") => {
   try {
     if (!url || url === "") {
@@ -30,6 +41,8 @@ export const dalleImgToCF = async (url = "") => {
     }
     const filename = await saveImgFromUrl(url);
     const cfUrl = await uploadToCloudflare(filename);
+    // delete file
+    await deleteFile(filename);
     return cfUrl;
   } catch (err) {
     console.error(err);
