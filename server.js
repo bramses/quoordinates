@@ -33,10 +33,17 @@ app.get('/', (req, res) => {
 })
 
 app.post('/search', async (req, res) => {
-    console.log(req.body)
-    const query = req.body.query
-    const results = await similaritySearch(query)
-    res.send(results)
+    try {
+        console.log(req.body)
+        const query = req.body.query
+        const results = await similaritySearch(query)
+        res.send(results)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({
+            error: err
+        })
+    }
 })
 
 app.post('/dalle-to-cf', async (req, res) => {
