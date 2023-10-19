@@ -43,7 +43,7 @@ app.post('/dalle-to-cf', async (req, res) => {
     console.log(req.body)
     const url = req.body.url
     const result = await dalleImgToCF(url)
-    res.send(result)
+    res.send({ result })
 })
 
 app.post('/add-thought', async (req, res) => {
