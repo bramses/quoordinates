@@ -7,6 +7,36 @@ import convert from "heic-convert";
 import dotenv from "dotenv";
 dotenv.config();
 
+
+async function saveImgFromUrl(url) {
+  try {
+    const response = await fetch(url);
+    const buffer = await response.buffer();
+    const filename = `${Date.now()}.png`;
+    // await writing buffer to file
+    fs.writeFileSync(filename, buffer);
+
+    return filename;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+export const dalleImgToCF = async (url = "") => {
+  try {
+    if (!url || url === "") {
+      throw new Error("URL is required");
+    }
+    const filename = await saveImgFromUrl(url);
+    const cfUrl = await uploadToCloudflare(filename);
+    return cfUrl;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 const convertHEIC = async (inputBuffer, quality = 1.0) => {
   try {
     console.log("Converting HEIC to JPEG with quality = " + quality);

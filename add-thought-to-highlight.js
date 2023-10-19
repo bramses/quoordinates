@@ -25,8 +25,6 @@ export const addThoughtToHighlight = async (highlightId, thought, userId) => {
         return
     }
 
-    console.log(highlight)
-
     const thoughts = highlight[0].thoughts
 
     const thoughtObj = {

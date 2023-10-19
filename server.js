@@ -4,6 +4,7 @@ import { similaritySearch } from './similarity-search.js';
 import { sharePic } from './share-pic.js';
 import { fetchRandomHighlight, fetchRandomHighlightInBookID } from './get-random-highlight.js';
 import { addThoughtToHighlight } from './add-thought-to-highlight.js';
+import { dalleImgToCF } from './cloudflare-images.js';
 
 
 const app = express();
@@ -36,6 +37,13 @@ app.post('/search', async (req, res) => {
     const query = req.body.query
     const results = await similaritySearch(query)
     res.send(results)
+})
+
+app.post('/dalle-to-cf', async (req, res) => {
+    console.log(req.body)
+    const url = req.body.url
+    const result = await dalleImgToCF(url)
+    res.send(result)
 })
 
 app.post('/add-thought', async (req, res) => {
