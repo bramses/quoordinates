@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { similaritySearch } from './similarity-search.js';
+import { similaritySearch, similaritySearchWhereBookIDs } from './similarity-search.js';
 import { sharePic } from './share-pic.js';
 import { fetchRandomHighlight, fetchRandomHighlightInBookID } from './get-random-highlight.js';
 import { addThoughtToHighlight } from './add-thought-to-highlight.js';
@@ -37,6 +37,21 @@ app.post('/search', async (req, res) => {
         console.log(req.body)
         const query = req.body.query
         const results = await similaritySearch(query)
+        res.send(results)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({
+            error: err
+        })
+    }
+})
+
+app.post('/search-by-book-ids', async (req, res) => {
+    try {
+        console.log(req.body)
+        const query = req.body.query
+        const book_ids = req.body.book_ids
+        const results = await similaritySearchWhereBookIDs(query, book_ids)
         res.send(results)
     } catch (err) {
         console.log(err)

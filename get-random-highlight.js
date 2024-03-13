@@ -25,7 +25,6 @@ export async function fetchRandomHighlightInBookID(bookIds, amount) {
 
     const ids = ids_table.map((id) => id.id); 
 
-
     if (error) throw error;
 
     const highlights = [];
