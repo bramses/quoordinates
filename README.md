@@ -15,6 +15,15 @@
 `nomic-viz.py` is a python script that visualizes highlights in nomic
 `readwise-highlights.py` is a python script that fetches highlights from readwise
 
+## Downstream Dependents
+
+The apps below depend on Quoordinates and display how versatile this technology is:
+
+- [Commonplace Bot](https://github.com/bramses/commonplace-bot) - A Discord Bot where quotes can be surfaced, discussed, and transformed in an MMO like format.
+- [Quo Host](https://github.com/bramses/quo-host/tree/main) - A realtime speech to semantic search to "higlight within highlight" surfacer. Sound smarter on podcasts.
+- [Kindle Streamer](https://github.com/bramses/kindle-streamer) - Use OCR on a cron job to take a picture of Kindle, and generate a visual bookmark using DALL-E.
+
+
 ## Setup
 
 1. Create a `.env` file with the following variables:
