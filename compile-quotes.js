@@ -184,4 +184,4 @@ const main = async () => {
   fs.writeFileSync("quotes.md", markdown);
 };
 
-main();
+// main();
