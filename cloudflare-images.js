@@ -13,7 +13,9 @@ dotenv.config();
 async function saveImgFromUrl(url) {
   try {
     const response = await fetch(url);
-    const buffer = await response.buffer();
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    // const buffer = await response.buffer();
     const filename = `${Date.now()}.png`;
     // await writing buffer to file
     fs.writeFileSync(filename, buffer);
