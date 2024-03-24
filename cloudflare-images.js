@@ -1,4 +1,5 @@
 import axios from "axios";
+import fetch from "node-fetch";
 // fs promises
 import { promises as fsPromises } from "fs";
 import fs from "fs";
