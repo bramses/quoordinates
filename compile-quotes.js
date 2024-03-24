@@ -22,7 +22,7 @@ const openai = new OpenAIApi(configuration);
 dotenv.config();
 
 const CLUSTER_THRESHOLD = 0.8;
-const BOOK_ID = "33431849";
+const BOOK_ID = "38318378";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -166,15 +166,19 @@ const main = async () => {
   // each quote is a bullet point under the heading
 
   let markdown = "";
+  let tableOfContents = "";
   for (let index = 0; index < clusteredQuotes.length; index++) {
     const cluster = clusteredQuotes[index];
     const topic = await assignTopicToCluster(cluster);
     console.log("Cluster " + index + ": " + topic);
+    tableOfContents += `${index + 1}. [Cluster ${index} - ${topic}](#cluster-${index}---${topic})\n`;
     markdown += `## Cluster ${index} - ${topic}\n`;
     cluster.forEach((quote) => {
       markdown += `- ${quote.text}\n`;
     });
   }
+
+    markdown = `# Table of Contents\n${tableOfContents}\n${markdown}`;
 
 
   fs.writeFileSync("quotes.md", markdown);
