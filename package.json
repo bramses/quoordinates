@@ -29,7 +29,6 @@
     "heic-convert": "^1.2.4",
     "jimp": "^0.22.10",
     "jsdom": "^24.0.0",
-    "mathjs": "^12.4.1",
     "ml-kmeans": "^6.0.0",
     "node-fetch": "^3.3.2",
     "openai": "^3.3.0",

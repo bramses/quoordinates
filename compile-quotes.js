@@ -9,7 +9,6 @@ import dotenv from "dotenv";
 import fs from "fs";
 import similarity from "compute-cosine-similarity";
 import { Configuration, OpenAIApi } from "openai";
-import * as math from "mathjs";
 import { kmeans } from "ml-kmeans";
 
 dotenv.config();
@@ -23,7 +22,6 @@ const openai = new OpenAIApi(configuration);
 
 dotenv.config();
 
-const CLUSTER_THRESHOLD = 0.78;
 const BOOK_ID = "38531384";
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -34,57 +32,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   },
 });
 
-// Define the k-means clustering algorithm
-function kMeansLocal(data, k) {
-  // Initialize the centroids
-  const centroids = [];
-  let prevCentroids = [];
-  for (let i = 0; i < k; i++) {
-    centroids.push(data[Math.floor(Math.random() * data.length)]);
-  }
-
-  // Assign each data point to the closest centroid
-  const assignments = [];
-  for (let i = 0; i < data.length; i++) {
-    const distances = [];
-    for (let j = 0; j < centroids.length; j++) {
-      distances.push(math.distance(data[i], centroids[j]));
-    }
-    assignments.push(distances.indexOf(Math.min(...distances)));
-  }
-
-  // Update the centroids
-  for (let i = 0; i < k; i++) {
-    const cluster = data.filter((d, j) => assignments[j] === i);
-    if (cluster.length === 0) {
-      continue;
-    }
-    centroids[i] = math.mean(cluster, 0);
-  }
-
-  // Repeat until the centroids no longer change
-  if (!math.deepEqual(centroids, prevCentroids)) {
-    prevCentroids = centroids;
-    return kMeans(data, k);
-  }
-
-  // Return the assignments
-  return assignments;
-}
-
-const getQuotes = async (bookId) => {
-  const { data, error } = await supabase
-    .from("highlights")
-    .select("*")
-    .eq("book_id", bookId);
-
-  if (error) {
-    console.error(error);
-    return [];
-  }
-
-  return data;
-};
 
 const getBookIDFromTitle = async (title) => {
   const { data, error } = await supabase
@@ -120,43 +67,6 @@ const compileQuotesFomID = async (bookID) => {
   const quotes = await getQuotes(bookID);
   return quotes;
 };
-
-function clusterEmbeddings(quotes, threshold = 0.01) {
-  let clusters = [];
-  let clusterIndex = 0;
-  let similarityAvg = 0;
-  let total = 0;
-
-  quotes.forEach((quote, index) => {
-    if (quote.cluster === undefined) {
-      quote.cluster = clusterIndex;
-      clusters[clusterIndex] = [quote];
-
-      quotes.forEach((otherQuote, otherIndex) => {
-        const quoteEmbedding = JSON.parse(quote.embedding);
-        const otherQuoteEmbedding = JSON.parse(otherQuote.embedding);
-
-        if (index === otherIndex) return;
-        const _similarity = similarity(quoteEmbedding, otherQuoteEmbedding);
-        if (otherQuote.cluster === undefined) {
-          if (_similarity > threshold) {
-            otherQuote.cluster = clusterIndex;
-            clusters[clusterIndex].push(otherQuote);
-          }
-        }
-
-        total++;
-        similarityAvg += _similarity;
-      });
-
-      clusterIndex++;
-    }
-  });
-
-  console.log("Average similarity: " + similarityAvg / total);
-
-  return clusters;
-}
 
 const assignTopicToCluster = async (cluster) => {
   try {
@@ -271,15 +181,6 @@ const main = async () => {
 
   console.log(quotes.length + " quotes found.");
 
-  // let clusteredQuotes = clusterEmbeddings(quotes, CLUSTER_THRESHOLD);
-
-  // Example usage
-  //   const data = [
-  //     [1, 2],
-  //     [3, 4],
-  //     [5, 6],
-  //     [7, 8],
-  //   ];
   const k = 5;
   const assignments = kmeans(
     quotes
@@ -288,7 +189,6 @@ const main = async () => {
     k
   );
 
-  // console.log(assignments);
 
   // convert each cluster into a heading and a list of quotes in markdown under it and write to a file
   // use cluster index as heading
