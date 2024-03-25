@@ -9,6 +9,8 @@ import dotenv from "dotenv";
 import fs from "fs";
 import similarity from "compute-cosine-similarity";
 import { Configuration, OpenAIApi } from "openai";
+import * as math from "mathjs";
+import { kmeans } from "ml-kmeans";
 
 dotenv.config();
 
@@ -21,8 +23,8 @@ const openai = new OpenAIApi(configuration);
 
 dotenv.config();
 
-const CLUSTER_THRESHOLD = 0.8;
-const BOOK_ID = "38318378";
+const CLUSTER_THRESHOLD = 0.78;
+const BOOK_ID = "38531384";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -31,6 +33,44 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     persistSession: false,
   },
 });
+
+// Define the k-means clustering algorithm
+function kMeansLocal(data, k) {
+  // Initialize the centroids
+  const centroids = [];
+  let prevCentroids = [];
+  for (let i = 0; i < k; i++) {
+    centroids.push(data[Math.floor(Math.random() * data.length)]);
+  }
+
+  // Assign each data point to the closest centroid
+  const assignments = [];
+  for (let i = 0; i < data.length; i++) {
+    const distances = [];
+    for (let j = 0; j < centroids.length; j++) {
+      distances.push(math.distance(data[i], centroids[j]));
+    }
+    assignments.push(distances.indexOf(Math.min(...distances)));
+  }
+
+  // Update the centroids
+  for (let i = 0; i < k; i++) {
+    const cluster = data.filter((d, j) => assignments[j] === i);
+    if (cluster.length === 0) {
+      continue;
+    }
+    centroids[i] = math.mean(cluster, 0);
+  }
+
+  // Repeat until the centroids no longer change
+  if (!math.deepEqual(centroids, prevCentroids)) {
+    prevCentroids = centroids;
+    return kMeans(data, k);
+  }
+
+  // Return the assignments
+  return assignments;
+}
 
 const getQuotes = async (bookId) => {
   const { data, error } = await supabase
@@ -120,7 +160,7 @@ function clusterEmbeddings(quotes, threshold = 0.01) {
 
 const assignTopicToCluster = async (cluster) => {
   try {
-    const prompt = `Given the following quotes, what is a good topic for them? Return only the topic as a Markdown heading with no leading #`;
+    const prompt = `Given the following quotes, what is a good topic for them? Return only the topic as a Markdown heading with no leading #. No bold (**) or italics (*) are needed.`;
 
     const completion = await openai.createChatCompletion({
       messages: [
@@ -154,34 +194,133 @@ const assignTopicToCluster = async (cluster) => {
   }
 };
 
+const summarizeCluster = async (cluster) => {
+  try {
+    const prompt = `Given the following quotes, summarize them into a two-three sentence summary. Return only the summary`;
+
+    const completion = await openai.createChatCompletion({
+      messages: [
+        {
+          role: "system",
+          content: prompt,
+        },
+        {
+          role: "user",
+          content: cluster.map((quote) => quote.text).join("\n"),
+        },
+      ],
+      model: "gpt-3.5-turbo",
+    });
+
+    const content = completion.data.choices[0].message.content;
+
+    return content.trim();
+  } catch (err) {
+    console.log("START ERROR");
+    console.error(err);
+    console.error(err.response);
+    console.error(err.response.data);
+    console.error(err.response.data.error);
+    console.error(err.response.data.error.message);
+    console.error(err.response.data.error.code);
+    console.error(err.response.data.error.status);
+    console.error(err.response.data.error.request);
+    console.log("END ERROR");
+    throw err;
+  }
+};
+
+const followUpQuestions = async (cluster) => {
+  try {
+    const prompt = `Given the following quotes, what are some follow up questions you could ask about them? Return only the questions as a bulleted list`;
+
+    const completion = await openai.createChatCompletion({
+      messages: [
+        {
+          role: "system",
+          content: prompt,
+        },
+        {
+          role: "user",
+          content: cluster.map((quote) => quote.text).join("\n"),
+        },
+      ],
+      model: "gpt-3.5-turbo",
+    });
+
+    const content = completion.data.choices[0].message.content;
+
+    return content.trim();
+  } catch (err) {
+    console.log("START ERROR");
+    console.error(err);
+    console.error(err.response);
+    console.error(err.response.data);
+    console.error(err.response.data.error);
+    console.error(err.response.data.error.message);
+    console.error(err.response.data.error.code);
+    console.error(err.response.data.error.status);
+    console.error(err.response.data.error.request);
+    console.log("END ERROR");
+    throw err;
+  }
+};
+
 const main = async () => {
   const quotes = await compileQuotesFomID(BOOK_ID);
 
   console.log(quotes.length + " quotes found.");
 
-  let clusteredQuotes = clusterEmbeddings(quotes, CLUSTER_THRESHOLD);
+  // let clusteredQuotes = clusterEmbeddings(quotes, CLUSTER_THRESHOLD);
+
+  // Example usage
+  //   const data = [
+  //     [1, 2],
+  //     [3, 4],
+  //     [5, 6],
+  //     [7, 8],
+  //   ];
+  const k = 5;
+  const assignments = kmeans(
+    quotes
+      .map((quote) => JSON.parse(quote.embedding))
+      .filter((quote) => quote.length === 1536),
+    k
+  );
+
+  // console.log(assignments);
 
   // convert each cluster into a heading and a list of quotes in markdown under it and write to a file
   // use cluster index as heading
   // each quote is a bullet point under the heading
-
   let markdown = "";
-  let tableOfContents = "";
-  for (let index = 0; index < clusteredQuotes.length; index++) {
-    const cluster = clusteredQuotes[index];
-    const topic = await assignTopicToCluster(cluster);
-    console.log("Cluster " + index + ": " + topic);
-    tableOfContents += `${index + 1}. [Cluster ${index} - ${topic}](#cluster-${index}---${topic})\n`;
-    markdown += `## Cluster ${index} - ${topic}\n`;
-    cluster.forEach((quote) => {
-      markdown += `- ${quote.text}\n`;
-    });
+
+  const clusters = [];
+  for (let i = 0; i < k; i++) {
+    clusters.push([]);
+  }
+  for (let i = 0; i < assignments.clusters.length; i++) {
+    clusters[assignments.clusters[i]].push(quotes[i]);
   }
 
-    markdown = `# Table of Contents\n${tableOfContents}\n${markdown}`;
+    for (let i = 0; i < clusters.length; i++) {
+      const cluster = clusters[i];
+      console.log(`Cluster ${i} has ${cluster.length} quotes.`);
+      const topic = await assignTopicToCluster(cluster);
+      const summary = await summarizeCluster(cluster);
+      // const followUp = await followUpQuestions(cluster);
 
+      markdown += `## ${topic}\n\n`;
+      markdown += `### Summary\n\n${summary}\n\n`;
+      markdown += `### Quotes\n\n`;
+      cluster.forEach((quote) => {
+        markdown += `- ${quote.text}\n`;
+      });
+      markdown += `\n\n`;
+      // markdown += `### Follow Up Questions\n\n${followUp}\n\n`;
+    }
 
-  fs.writeFileSync("quotes.md", markdown);
+      fs.writeFileSync("output.md", markdown);
 };
 
 // main();

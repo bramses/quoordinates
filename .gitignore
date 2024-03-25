@@ -6,3 +6,4 @@ records*.json
 books-notion-table.csv
 kindle-highlights
 kindle-export-supabase.js
+ocr
