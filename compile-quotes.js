@@ -22,7 +22,7 @@ const openai = new OpenAIApi(configuration);
 
 dotenv.config();
 
-const BOOK_ID = "38531384";
+const BOOK_ID = "38318378";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -68,6 +68,20 @@ const compileQuotesFomID = async (bookID) => {
   return quotes;
 };
 
+const getQuotes = async (bookId) => {
+  const { data, error } = await supabase
+    .from("highlights")
+    .select("*")
+    .eq("book_id", bookId);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data;
+};
+
 const assignTopicToCluster = async (cluster) => {
   try {
     const prompt = `Given the following quotes, what is a good topic for them? Return only the topic as a Markdown heading with no leading #. No bold (**) or italics (*) are needed.`;
@@ -103,6 +117,46 @@ const assignTopicToCluster = async (cluster) => {
     throw err;
   }
 };
+
+const highlightQuote = async (quote, topic) => {
+  console.log(`Highlighting quote: ${quote} for topic: ${topic}`);
+  try {
+    const prompt = `Given the following quote, highlight the part related to the topic using ** (MD bold). Return the quote with the relevant part highlighted. Say nothing else. Do not include the topic in the response.`;
+
+    const completion = await openai.createChatCompletion({
+      messages: [
+        {
+          role: "system",
+          content: prompt,
+        },
+        {
+          role: "user",
+          content: `Quote: <start>${quote}<end>\n\nTopic: ${topic}\n\nHighlighted Quote (Verbatim):`,
+        },
+      ],
+      model: "gpt-3.5-turbo",
+    });
+
+    const content = completion.data.choices[0].message.content;
+
+    console.log(content);
+
+    return content.trim();
+  } catch (err) {
+    console.log("START ERROR");
+    console.error(err);
+    console.error(err.response);
+    console.error(err.response.data);
+    console.error(err.response.data.error);
+    console.error(err.response.data.error.message);
+    console.error(err.response.data.error.code);
+    console.error(err.response.data.error.status);
+    console.error(err.response.data.error.request);
+    console.log("END ERROR");
+    throw err;
+  }
+}
+
 
 const summarizeCluster = async (cluster) => {
   try {
@@ -213,9 +267,9 @@ const main = async () => {
       markdown += `## ${topic}\n\n`;
       markdown += `### Summary\n\n${summary}\n\n`;
       markdown += `### Quotes\n\n`;
-      cluster.forEach((quote) => {
-        markdown += `- ${quote.text}\n`;
-      });
+      for (const quote of cluster) {
+        markdown += `- ${await highlightQuote(quote.text, topic)}\n`;
+      }
       markdown += `\n\n`;
       // markdown += `### Follow Up Questions\n\n${followUp}\n\n`;
     }
@@ -223,4 +277,7 @@ const main = async () => {
       fs.writeFileSync("output.md", markdown);
 };
 
-// main();
+// if env var DEV exists, run main
+if (process.env.DEV) {
+  main();
+}
