@@ -70,6 +70,11 @@ node embed-into-supabase.js
 python nomic-viz.py
 ```
 
+## Other
+
+There are other tools in this repo too!
+- [compile quotes](https://github.com/bramses/quoordinates/blob/main/compile-quotes.js) - use k-means to make a cluster of all quotes from a book and give them topic titles
+
 ## Images
 
 ![Screenshot 2023-07-26 01-46-45](https://github.com/bramses/quoordinates/assets/3282661/b618e3ce-f66b-41a7-ba9d-03b5ef1bd65c)
