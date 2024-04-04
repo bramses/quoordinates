@@ -74,6 +74,7 @@ python nomic-viz.py
 
 There are other tools in this repo too!
 - [compile quotes](https://github.com/bramses/quoordinates/blob/main/compile-quotes.js) - use k-means to make a cluster of all quotes from a book and give them topic titles
+- [share-pic](https://github.com/bramses/quoordinates/blob/28a58bcd27ac8a4d3480129f028d282d3bf138c9/share-pic.js#L461) - use a quote, dalle, and cf images to save a quote and image in one eye catching piece
 
 ## Images
 
