@@ -22,7 +22,7 @@ const openai = new OpenAIApi(configuration);
 
 dotenv.config();
 
-const BOOK_ID = "38318378";
+const BOOK_ID = "1474870";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -235,7 +235,8 @@ const main = async () => {
 
   console.log(quotes.length + " quotes found.");
 
-  const k = 5;
+  // w want roughly 5-10 quotes per cluster
+  const k = Math.ceil(quotes.length / 5);
   const assignments = kmeans(
     quotes
       .map((quote) => JSON.parse(quote.embedding))
@@ -267,8 +268,14 @@ const main = async () => {
       markdown += `## ${topic}\n\n`;
       markdown += `### Summary\n\n${summary}\n\n`;
       markdown += `### Quotes\n\n`;
+      // // add each quote to the markdown with highlighting
+      // for (const quote of cluster) {
+      //   markdown += `- ${await highlightQuote(quote.text, topic)}\n`;
+      // }
+      // markdown += `\n\n`;
+      // add each quote to the markdown without highlighting
       for (const quote of cluster) {
-        markdown += `- ${await highlightQuote(quote.text, topic)}\n`;
+        markdown += `- ${quote.text}\n`;
       }
       markdown += `\n\n`;
       // markdown += `### Follow Up Questions\n\n${followUp}\n\n`;

@@ -211,4 +211,7 @@ const justBooks = async () => {
     // console.log(highlights.length)
 }
 
-// justBooks()
+// justBooks() only runs if flag is set and also in termina process arg is set
+if (process.env.DEV && process.argv[2] === 'justBooks') {
+    justBooks()
+}
