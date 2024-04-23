@@ -43,7 +43,7 @@ const generateQuestion = async (text) => {
             content: prompt,
           },
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4-turbo",
       });
   
       const content = completion.data.choices[0].message.content;

@@ -63,7 +63,7 @@ const main = async () => {
     const contextPrompt = `I only have the following quote, recreate outside context using concepts from the world. Do a breadth first search of external data. This means that you are **not rephrasing the content in the quote**. You are pulling in examples and information from the world **outside the set** of the quote. Do not bother repeating or rehashing the quote.\n\nQuote:\n${quote.text}\n-- ${quote.title} by ${quote.author}\n\nContext:\n`;
 
     const completion = await openai.createChatCompletion({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4-turbo",
       messages: [
         {
           role: "system",
