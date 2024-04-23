@@ -1,0 +1,1 @@
+// convert file from my supabase to commonplace ide format of { data, metadata, embedding }
