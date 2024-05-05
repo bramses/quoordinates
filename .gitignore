@@ -9,3 +9,4 @@ kindle-export-supabase.js
 ocr
 note_exports
 alfred-searches
+*.csv

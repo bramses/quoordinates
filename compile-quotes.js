@@ -240,7 +240,7 @@ const main = async () => {
   const assignments = kmeans(
     quotes
       .map((quote) => JSON.parse(quote.embedding))
-      .filter((quote) => quote.length === 1536),
+      .filter((embedding) => embedding.length === 1536),
     k
   );
 
