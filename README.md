@@ -1,6 +1,6 @@
 # Quoordinates (Quote Coordinates)
 
-[**check out the general purpose PostgresDB version of Quoordinates I'm working on -- Commonbase!!**](https://github.com/bramses/commonbase-prototype)
+[**check out the general purpose PostgresDB prototype version of Quoordinates I'm working on -- Commonbase!!**](https://github.com/bramses/commonbase-prototype)
 
 - Readwise
 - OpenAI Embeddings
